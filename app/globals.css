@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-white text-gray-800 font-inter antialiased;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary to-violet-500 bg-clip-text text-transparent;
+  }
+  .dot-grid {
+    background-image: radial-gradient(circle, #7C3AED22 1.5px, transparent 1.5px);
+    background-size: 22px 22px;
+  }
+  .hero-blob {
+    border-radius: 63% 37% 54% 46% / 55% 48% 52% 45%;
+  }
+  .tab-active {
+    @apply bg-primary text-white;
+  }
+  .tab-inactive {
+    @apply bg-gray-100 text-gray-500 hover:bg-primaryLight hover:text-primary;
+  }
+}
