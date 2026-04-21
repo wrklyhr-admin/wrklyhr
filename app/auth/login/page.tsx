@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -13,64 +14,81 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { FormField } from "@/components/ui/form-field";
 import { Spinner } from "@/components/ui/spinner";
-import { signupSchema } from "@/lib/validations";
+import { loginSchema } from "@/lib/validations";
 import { toast } from "@/components/ui/use-toast";
 
-type FormValues = z.infer<typeof signupSchema>;
+type FormValues = z.infer<typeof loginSchema>;
 
-export default function SignupPage() {
+function LoginForm() {
   const router = useRouter();
+  const search = useSearchParams();
+  const callbackUrl = search.get("callbackUrl") || "/dashboard";
+
   const [showPwd, setShowPwd] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { errors },
   } = useForm<FormValues>({
-    resolver: zodResolver(signupSchema),
-    defaultValues: { email: "", password: "", confirmPassword: "" },
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: "", password: "" },
   });
+
+  const handleResend = async () => {
+    const email = getValues("email");
+    if (!email) return;
+    await fetch("/api/auth/resend-verification", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    toast({ title: "Verification email sent", description: "Check your inbox." });
+  };
 
   const onSubmit = async (values: FormValues) => {
     setSubmitting(true);
     try {
-      const res = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: values.email,
-          password: values.password,
-          confirmPassword: values.confirmPassword,
-        }),
+      const res = await signIn("credentials", {
+        email: values.email,
+        password: values.password,
+        redirect: false,
       });
-      const data = await res.json();
 
-      if (res.status === 409) {
-        toast({
-          variant: "destructive",
-          title: "Account exists",
-          description: "An account with this email already exists",
-        });
+      if (res?.error) {
+        if (res.error.includes("EMAIL_NOT_VERIFIED")) {
+          toast({
+            variant: "destructive",
+            title: "Email not verified",
+            description: "Please verify your email first.",
+            action: (
+              <button
+                onClick={handleResend}
+                className="text-xs font-semibold text-violet-300 hover:underline mt-1"
+              >
+                Resend verification
+              </button>
+            ),
+          });
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Sign in failed",
+            description: "Invalid email or password",
+          });
+        }
         return;
       }
 
-      if (!res.ok || !data.success) {
-        toast({
-          variant: "destructive",
-          title: "Signup failed",
-          description: data.error || "Something went wrong",
-        });
-        return;
-      }
-
-      router.push(`/auth/verify-email?email=${encodeURIComponent(values.email)}`);
+      router.push(callbackUrl);
+      router.refresh();
     } catch (err) {
       toast({
         variant: "destructive",
         title: "Network error",
-        description: "Please check your connection and try again",
+        description: "Please try again",
       });
     } finally {
       setSubmitting(false);
@@ -88,8 +106,8 @@ export default function SignupPage() {
             wrkly<span className="text-violet-400">.hr</span>
           </span>
         </Link>
-        <CardTitle>Create your account</CardTitle>
-        <CardDescription>Start your remote job search today</CardDescription>
+        <CardTitle>Welcome back</CardTitle>
+        <CardDescription>Sign in to your account</CardDescription>
       </CardHeader>
 
       <CardContent>
@@ -104,13 +122,25 @@ export default function SignupPage() {
             />
           </FormField>
 
-          <FormField label="Password" htmlFor="password" error={errors.password?.message}>
+          <FormField
+            label="Password"
+            htmlFor="password"
+            error={errors.password?.message}
+            hint={
+              <Link
+                href="/auth/forgot-password"
+                className="text-xs text-violet-400 hover:underline font-medium"
+              >
+                Forgot password?
+              </Link>
+            }
+          >
             <div className="relative">
               <Input
                 id="password"
                 type={showPwd ? "text" : "password"}
-                placeholder="min 8 chars, 1 uppercase, 1 number"
-                autoComplete="new-password"
+                placeholder="enter your password"
+                autoComplete="current-password"
                 className="pr-10"
                 {...register("password")}
               />
@@ -125,50 +155,33 @@ export default function SignupPage() {
             </div>
           </FormField>
 
-          <FormField
-            label="Confirm Password"
-            htmlFor="confirmPassword"
-            error={errors.confirmPassword?.message}
-          >
-            <div className="relative">
-              <Input
-                id="confirmPassword"
-                type={showConfirm ? "text" : "password"}
-                placeholder="re-enter your password"
-                autoComplete="new-password"
-                className="pr-10"
-                {...register("confirmPassword")}
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirm(!showConfirm)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
-                tabIndex={-1}
-              >
-                {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
-            </div>
-          </FormField>
-
           <Button type="submit" className="w-full mt-2" disabled={submitting}>
             {submitting ? (
               <>
                 <Spinner className="w-4 h-4 mr-2" />
-                Creating account...
+                Signing in...
               </>
             ) : (
-              "Create account"
+              "Sign in"
             )}
           </Button>
         </form>
 
         <p className="mt-5 text-sm text-zinc-400 text-center">
-          Already have an account?{" "}
-          <Link href="/auth/login" className="text-violet-400 hover:underline font-medium">
-            Sign in
+          Don&apos;t have an account?{" "}
+          <Link href="/auth" className="text-violet-400 hover:underline font-medium">
+            Get started
           </Link>
         </p>
       </CardContent>
     </Card>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
   );
 }
