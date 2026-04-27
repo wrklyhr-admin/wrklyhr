@@ -48,7 +48,7 @@ function ResetPasswordContent() {
 
   useEffect(() => {
     if (done) {
-      const t = setTimeout(() => router.push("/auth/login"), 2000);
+      const t = setTimeout(() => router.push("/signup/login"), 2000);
       return () => clearTimeout(t);
     }
   }, [done, router]);
@@ -63,7 +63,7 @@ function ResetPasswordContent() {
         </CardHeader>
         <CardContent>
           <Button asChild className="w-full">
-            <Link href="/auth/forgot-password">Request a new link</Link>
+            <Link href="/signup/forgot-password">Request a new link</Link>
           </Button>
         </CardContent>
       </Card>

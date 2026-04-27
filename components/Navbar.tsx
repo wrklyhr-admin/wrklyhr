@@ -57,11 +57,11 @@ export default function Navbar() {
 
         {/* Actions */}
         <div className="hidden md:flex items-center gap-4">
-          <a href="/auth" className="text-sm font-semibold text-gray-700 hover:text-primary transition-colors">
+          <a href="/signup" className="text-sm font-semibold text-gray-700 hover:text-primary transition-colors">
             Log in
           </a>
           <a
-            href="/auth"
+            href="/signup"
             className="px-5 py-2.5 rounded-full bg-primary text-white text-sm font-semibold hover:bg-primaryDark transition-colors"
           >
             Post a Job
@@ -89,7 +89,7 @@ export default function Navbar() {
                   {l.label}
                 </a>
               ))}
-              <a href="/auth" onClick={() => setOpen(false)}
+              <a href="/signup" onClick={() => setOpen(false)}
                 className="mt-1 text-center px-5 py-3 rounded-full bg-primary text-white font-semibold text-sm">
                 Post a Job
               </a>

@@ -30,7 +30,7 @@ export default auth((req) => {
   if (!isTalentRoute && !isAdminRoute) return NextResponse.next();
 
   if (!session) {
-    const loginUrl = new URL("/auth/login", nextUrl.origin);
+    const loginUrl = new URL("/signup/login", nextUrl.origin);
     loginUrl.searchParams.set("callbackUrl", path);
     return NextResponse.redirect(loginUrl);
   }

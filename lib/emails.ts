@@ -4,7 +4,7 @@ const FROM = process.env.RESEND_FROM_EMAIL || "wrkly.hr <onboarding@resend.dev>"
 const APP_URL = process.env.NEXTAUTH_URL || "http://localhost:5000";
 
 export async function sendVerificationEmail(email: string, token: string) {
-  const link = `${APP_URL}/auth/verify-email?token=${token}`;
+  const link = `${APP_URL}/signup/verify-email?token=${token}`;
   return getResend().emails.send({
     from: FROM,
     to: email,
@@ -23,7 +23,7 @@ export async function sendVerificationEmail(email: string, token: string) {
 }
 
 export async function sendPasswordResetEmail(email: string, token: string) {
-  const link = `${APP_URL}/auth/reset-password?token=${token}`;
+  const link = `${APP_URL}/signup/reset-password?token=${token}`;
   return getResend().emails.send({
     from: FROM,
     to: email,

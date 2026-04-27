@@ -66,7 +66,7 @@ export default function CTABanner() {
 
             {/* CTA */}
             <a
-              href="/auth"
+              href="/signup"
               className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-white text-primaryDark font-bold hover:bg-primaryLight transition-colors"
             >
               Get Started Free <ArrowRight className="w-4 h-4" />

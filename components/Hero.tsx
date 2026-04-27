@@ -43,7 +43,7 @@ export default function Hero() {
           {/* CTAs */}
           <div className="flex flex-wrap gap-4 mb-10">
             <a
-              href="/auth"
+              href="/signup"
               className="flex items-center gap-2 px-7 py-3.5 rounded-full bg-primary text-white font-semibold hover:bg-primaryDark transition-colors"
             >
               Get Full List <ArrowRight className="w-4 h-4" />

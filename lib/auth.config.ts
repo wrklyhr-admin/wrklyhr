@@ -2,7 +2,7 @@ import type { NextAuthConfig } from "next-auth";
 
 export const authConfig = {
   pages: {
-    signIn: "/auth/login",
+    signIn: "/signup/login",
   },
   session: { strategy: "jwt" },
   trustHost: true,

@@ -110,7 +110,7 @@ function VerifyEmailContent() {
       <CardContent className="flex flex-col gap-3">
         {status === "success" && (
           <Button asChild className="w-full">
-            <Link href="/auth/login">Sign in now</Link>
+            <Link href="/signup/login">Sign in now</Link>
           </Button>
         )}
 
@@ -136,7 +136,7 @@ function VerifyEmailContent() {
         )}
 
         <p className="text-sm text-zinc-400 text-center mt-2">
-          <Link href="/auth/login" className="text-violet-400 hover:underline font-medium">
+          <Link href="/signup/login" className="text-violet-400 hover:underline font-medium">
             Back to sign in
           </Link>
         </p>
